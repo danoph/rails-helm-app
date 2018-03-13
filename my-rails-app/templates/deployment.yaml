@@ -1,22 +1,30 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: {{ template "fullname" . }}
+  name: {{ template "my-rails-app.fullname" . }}
   labels:
-    chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
+    app: {{ template "my-rails-app.name" . }}
+    chart: {{ template "my-rails-app.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
 spec:
   replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: {{ template "my-rails-app.name" . }}
+      release: {{ .Release.Name }}
   template:
     metadata:
       labels:
-        app: {{ template "fullname" . }}
+        app: {{ template "my-rails-app.name" . }}
+        release: {{ .Release.Name }}
     spec:
       containers:
       - name: {{ .Chart.Name }}
         image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         ports:
-        - containerPort: {{ .Values.service.internalPort }}
+        - containerPort: {{ .Values.service.port }}
         env:
         - name: MARIADB_HOST
           value: {{ template "mariadb.fullname" . }}
@@ -32,12 +40,12 @@ spec:
         livenessProbe:
           httpGet:
             path: /
-            port: {{ .Values.service.internalPort }}
+            port: {{ .Values.service.port }}
           initialDelaySeconds: 180 # We need to wait for the database initialization
           timeoutSeconds: 5
         readinessProbe:
           httpGet:
             path: /
-            port: {{ .Values.service.internalPort }}
+            port: {{ .Values.service.port }}
           initialDelaySeconds: 60
           timeoutSeconds: 5

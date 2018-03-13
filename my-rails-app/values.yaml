@@ -2,14 +2,13 @@ replicaCount: 1
 
 image:
   repository: danoph/my-rails-app
-  tag: 0.1.0
+  tag: 0.1.1
   pullPolicy: IfNotPresent
 
 service:
   name: http
   type: NodePort
-  externalPort: 80
-  internalPort: 3000
+  port: 3000
 
 ingress:
   enabled: false
@@ -29,16 +28,6 @@ ingress:
 #tolerations: []
 
 #affinity: {}
-
-image:
-  repository: danoph/my-rails-app
-  tag: 0.1.0
-  pullPolicy: IfNotPresent
-service:
-  name: http
-  type: NodePort
-  externalPort: 80
-  internalPort: 3000
 resources:
   limits:
     cpu: 100m
